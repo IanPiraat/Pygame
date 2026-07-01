@@ -5,13 +5,13 @@ WIDTH =600
 HEIGHT =750
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
-picture1 = pygame.image.load("images\Image20260617160552.jpg")
+picture1 = pygame.image.load("images\images greetingcard\Image20260617160552.jpg")
 picture1 = pygame.transform.scale(picture1,(600,750))
 
-picture2 = pygame.image.load("images\Image20260617160618.jpg")
+picture2 = pygame.image.load("images\images greetingcard\Image20260617160557.jpg")
 picture2 = pygame.transform.scale(picture2,(200,200))
 
-picture3 = pygame.image.load("images\Image20260617160557.jpg")
+picture3 = pygame.image.load("images\images greetingcard\Image20260617160618.jpg")
 picture3 = pygame.transform.scale(picture3,(600,750))
 
 font1 = pygame.font.SysFont("Sans Serif",50)
