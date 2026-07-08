@@ -1,7 +1,12 @@
 import pygame
+import random
 pygame.init()
+
+pygame.mixer.init()
+
 WIDTH =1600
 HEIGHT =1000
+
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 p_space = pygame.image.load("images\imagespace\Image20260617164523.png")
 p_space = pygame.transform.scale(p_space,(1600,1000))
@@ -17,6 +22,17 @@ p_player2 = pygame.transform.rotate(p_player2,90)
 bullets1 = pygame.sprite.Group()
 bullets2 = pygame.sprite.Group()
 
+buff1 = pygame.image.load("images\imagespace\heal.png")
+buff2 = pygame.image.load("images\imagespace\damage.png")
+
+buffimages = [buff1,buff2]
+buffgroup = pygame.sprite.Group()
+
+hit = pygame.mixer.Sound("sounds\spacesound\hit.wav")
+move = pygame.mixer.Sound("sounds\spacesound\move.wav")
+shoot = pygame.mixer.Sound("sounds\spacesound\shoot.wav")
+music = pygame.mixer.Sound("sounds\spacesound\music.wav")
+
 
 
 
@@ -30,40 +46,52 @@ class player(pygame.sprite.Sprite) :
         self.color = color
         if self.color == "red" :
             self.image = p_player1
+            self.image = pygame.transform.scale(self.image,(250,200))
         elif self.color == "yellow" :
             self.image = p_player2
+            self.image = pygame.transform.scale(self.image,(250,200))
         self.rect = self.image.get_rect()
-        self.rect.center = (self.x,self.y)
+        self.rect.topleft = (self.x,self.y)
         self.health = 100
     def move_ship(self,k)  :
         if self.color == "red" :
-            if k[pygame.K_w] and self.rect.y > -200 :
+            if k[pygame.K_w] and self.rect.y > -100:
                 self.rect.y -= 5 
-            if k[pygame.K_s]  and self.rect.y < 750 : 
+                move.play()
+            if k[pygame.K_s]  and self.rect.y < 900 :
                 self.rect.y += 5
-            if k[pygame.K_d] and self.rect.x < 525 :
-                self.rect.x += 5    
+                move.play()
+            if k[pygame.K_d] and self.rect.x < 550 :
+                self.rect.x += 5
+                move.play()    
             if k[pygame.K_a] and self.rect.x > -200 :
                 self.rect.x -= 5
+                move.play()
         elif self.color == "yellow" :
-            if k[pygame.K_UP] and self.rect.y > -200:
+            if k[pygame.K_UP] and self.rect.y > -100:
                 self.rect.y -= 5
-            if k[pygame.K_DOWN] and self.rect.y < 750  :
+                move.play()
+            if k[pygame.K_DOWN] and self.rect.y < 900 :
                 self.rect.y += 5
+                move.play()
             if k[pygame.K_RIGHT] and self.rect.x < 1450 :
-                self.rect.x += 5    
-            if k[pygame.K_LEFT] and self.rect.x > 700 :
+                self.rect.x += 5
+                move.play()    
+            if k[pygame.K_LEFT] and self.rect.x > 800 :
                 self.rect.x -= 5
+                move.play()
 class bullet(pygame.sprite.Sprite) :
     def __init__(self,x,y,color):
         super().__init__()
         self.x = x
         self.y = y 
         self.color = color
-        self.rect = pygame.Rect(self.x,self.y,5,5)
+        self.rect = pygame.Rect(self.x,self.y,100,20)
     def update(self) :
+       
         if self.color == "red" :
             self.rect.x += 5
+            
             if self.rect.x > 1600 :
                 self.kill()
 
@@ -72,7 +100,18 @@ class bullet(pygame.sprite.Sprite) :
             if self.rect.x < 0 :
                 self.kill()
 
+class buffs(pygame.sprite.Sprite) :
+    def __init__(self,x,y) :
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = random.choice(buffimages)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x,self.y
 
+
+
+                
 
 
     
@@ -81,7 +120,7 @@ class bullet(pygame.sprite.Sprite) :
 player1 = player(400,500,"red")
 player2 = player(1200,500,"yellow")
 
-
+music.play(-1)
 
 while True :
     screen.fill("white")
@@ -89,15 +128,16 @@ while True :
         if event.type == pygame.QUIT :
             pygame.quit()
 
-    keys = pygame.key.get_pressed() 
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                shoot.play()
+                red = bullet(player1.rect.x, player1.rect.y + 75, "red")
+                bullets1.add(red)
 
-    if keys[pygame.K_SPACE] :
-        red = bullet(player1.rect.x,player1.rect.y,"red")
-        bullets1.add(red)
-
-    if keys[pygame.K_RSHIFT] :
-        yellow = bullet(player2.rect.x,player2.rect.y,"yellow")
-        bullets2.add(yellow)
+            elif event.key == pygame.K_RSHIFT:
+                shoot.play()
+                yellow = bullet(player2.rect.x, player2.rect.y + 75, "yellow")
+                bullets2.add(yellow)
 
 
 
@@ -105,14 +145,14 @@ while True :
             
     screen.blit(p_space,(0,0))
 
-    screen.blit(player1.image,player1.rect.center)
+    screen.blit(player1.image,player1.rect.topleft)
     text1 = font1.render("Health = {}".format(player1.health),True,"#c2380e")
     text2 = font1.render("Health = {}".format(player2.health),True,"#ffe100")
     screen.blit(text1,(50,950))
     screen.blit(text2,(1350,950))
 
    
-    screen.blit(player2.image,player2.rect.center)
+    screen.blit(player2.image,player2.rect.topleft)
     pygame.draw.rect(screen,"black",pygame.Rect(800,0,25,1000))
     keys_pressed = pygame.key.get_pressed()
     player1.move_ship(keys_pressed)
@@ -123,6 +163,16 @@ while True :
 
     for yellowbullet in bullets2 :
         pygame.draw.rect(screen,"yellow",yellowbullet.rect)
+        if player1.rect.colliderect(yellowbullet.rect) :
+            player1.health -= 2
+            hit.play()
+            yellowbullet.kill()
+
+    for redbullet in bullets1 :
+        if player2.rect.colliderect(redbullet.rect) :
+            player2.health -= 2
+            hit.play()
+            redbullet.kill()
 
     bullets1.update()
     bullets2.update()
