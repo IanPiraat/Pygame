@@ -1,7 +1,11 @@
+
+import random
 import pygame
 pygame.init()
 WIDTH =500
 HEIGHT =500
+score1 = 0
+score2 = 0 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 player_image = pygame.image.load("images/images 2player!/pirate/pirate.png")
 player_image = pygame.transform.scale(player_image,(75,75))
@@ -9,37 +13,64 @@ player_image = pygame.transform.scale(player_image,(75,75))
 player_image2 = pygame.image.load("images/images 2player!/pirate/parrot.png")
 player_image2 = pygame.transform.scale(player_image2,(75,75))
 
-class payer1() :
-    def __init__(self,x,y,image):
-        self.x = x
-        self.y = y
-        self.image = image
-    def drawr(self) :
-        screen.blit(self.image,(self.x,self.y))
-    def up(self) :
-        self.y -= .1
-    def down(self) :
-        self.y += .1
-    def right(self) :
-        self.x += .1
-    def left(self) :
-        self.x -= .1
-class payer2() :
-    def __init__(self,x,y,image):
-        self.x = x
-        self.y = y
-        self.image = image
-    def drawr1(self) :
-        screen.blit(self.image,(self.x,self.y))
-    def up1(self) :
-        self.y -= .1
-    def down1(self) :
-        self.y += .1
-    def right1(self) :
-        self.x += .1
-    def left1(self) :
-        self.x -= .1           
+collectible_image = pygame.image.load("images\images 2player!\pirate\damage.png")
+collectible_image = pygame.transform.scale(collectible_image,(75,75))")
 
+
+playergroup = pygame.sprite.Group() 
+collectiblegroup = pygame.sprite.Group()
+
+
+font = pygame.font.SysFont("Arial",24)
+
+class payer1(pygame.sprite.Sprite) :
+    def __init__(self,x,y,image):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x,self.y
+    def update(self,k) :
+        
+        if k[pygame.K_UP]:
+                self.rect.y -= 1
+        if k[pygame.K_DOWN] :
+                self.rect.y += 1
+        if k[pygame.K_RIGHT] :
+                self.rect.x += 1
+        if k[pygame.K_LEFT] :
+                self.rect.x -= 1
+                
+class payer2(pygame.sprite.Sprite) :
+    def __init__(self,x,y,image):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = self.x,self.y
+        
+
+    def update(self,k)  :
+            if k[pygame.K_w]:
+                self.rect.y -= 1
+                
+            if k[pygame.K_s]:
+                self.rect.y += 1
+                
+            if k[pygame.K_d]:
+                self.rect.x += 1
+                
+            if k[pygame.K_a]:
+                self.rect.x -= 1
+                
+class collectible(pygame.sprite.Sprite) :
+    def __init__(self,x,y,image):
+            super().__init__()   
+            self.x = x
+            self.y = y
+            self.image = image      
 
 
 
@@ -47,37 +78,31 @@ class payer2() :
 player1 = payer1(175,250,player_image)
 player2 = payer2(175,300,player_image2)
 
+collectible = 
+player1.add(playergroup)
+
+player2.add(collectiblegroup)
+    
+
 while True :
     screen.fill("white")
     for event in pygame.event.get() :
         if event.type == pygame.QUIT :
             pygame.quit()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w] :
-        player1.up()
-    if keys[pygame.K_s] :
-        player1.down()
-    if keys[pygame.K_d] :
-        player1.right()
-    if keys[pygame.K_a] :
-        player1.left()
+    text1 = font.render("score1 = {}".format(score1),True,"#000000")
+    screen.blit(text1,(50,50))
 
+    text2 = font.render("score2 = {}".format(score2),True,"#000000")
+    screen.blit(text2,(350,50))
 
-    if keys[pygame.K_UP] :
-        player2.up1()
-    if keys[pygame.K_DOWN] :
-        player2.down1()
-    if keys[pygame.K_RIGHT] :
-        player2.right1()
-    if keys[pygame.K_LEFT] :
-        player2.left1()            
+    key = pygame.key.get_pressed()
+    playergroup.update(key)
+    collectiblegroup.update(key)
 
+    playergroup.draw(screen)
+    collectiblegroup.draw(screen)
 
-
-
-
-    player1.drawr()
-    player2.drawr1()
+    
     pygame.display.update()
 
 
