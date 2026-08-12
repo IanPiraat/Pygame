@@ -20,7 +20,7 @@ class bird(pygame.sprite.Sprite):
         self.y = y
         self.x = x
         self.image = image
-        self.rect = self.image.getrect()
+        self.rect = self.image.get_rect()
         self.rect.center = self.x,self.y
 
         
@@ -58,7 +58,7 @@ while True :
         groundx -= .5
         if groundx < -450 :
             groundx = 0
-    flappygroup.draw()        
+    flappygroup.draw(screen)        
     pygame.display.update()
 
 
