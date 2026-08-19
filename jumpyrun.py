@@ -7,15 +7,28 @@ score = 0
 playerstatus = 1
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 background = pygame.image.load("images/imagesjumpyrun/desertbackground.png")
+score_background = pygame.image.load("images/imagesjumpyrun/space.png")
+
+    #background = pygame.image.load("images\imagesjumpyrun\space.png")    
 
 playeridle = pygame.image.load("images/imagesjumpyrun/playeridle.png")
 playerjump = pygame.image.load("images/imagesjumpyrun/playerjump.png")
 
 font1 = pygame.font.SysFont("Sans Serif",50)
 
-briefcaseimage = pygame.image.load("images/imagesjumpyrun/briefcase.png")
+briefcaseimages = [
+    "images/imagesjumpyrun/parrot.png",
+    "images/imagesjumpyrun/briefcase.png"
+]
+
 
 clock = pygame.time.Clock()
+
+
+music = pygame.mixer.Sound("sounds\spacesound\sounds jumpyrun\Lexica - Helios.wav")
+
+
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, image):
@@ -45,16 +58,16 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.y < self.ground_y:
             self.rect.y += 3
 class Briefcase(pygame.sprite.Sprite):
-    def __init__(self, x, image):
+    def __init__(self, x, image, is_parrot):
         super().__init__()
         self.image = image
+        self.is_parrot = is_parrot
         self.x = x
         self.y = random.randint(300,500)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.x,self.y
         self.start_x = x
         self.active = True
-
 
     def update(self):
         global score
@@ -63,13 +76,16 @@ class Briefcase(pygame.sprite.Sprite):
             self.rect.x -= 3
         else:
             self.kill()
-            score += 1
+            score -= 1
             
     def check_collision(self, player_rect):
         global score
         if self.active and self.rect.colliderect(player_rect):
             self.kill()
-            score -= 1
+            if self.is_parrot:
+                score += 2
+            else :
+                score += 1    
             return True
         return False
 
@@ -81,7 +97,7 @@ class Briefcase(pygame.sprite.Sprite):
 
 
 
-player = Player(100, 400, playeridle)
+player = Player(100, 450, playeridle)
 playergroup = pygame.sprite.Group()
 briefcasegroup = pygame.sprite.Group()
 
@@ -89,14 +105,19 @@ playergroup.add(player)
 briefcase = None
 start = 0
 count = 0
+music.play(-1)
 while True :
     dt = clock.tick(60)
     count += 1
     
+    if score >= 5:
+        background = score_background
     screen.blit(background,(0,0))
     
     if count > 0 and count % 300 == 0 :
-        briefcase = Briefcase(WIDTH, briefcaseimage)
+        briefcasepath = random.choice(briefcaseimages)
+        briefcaseimage = pygame.image.load(briefcasepath)
+        briefcase = Briefcase(WIDTH, briefcaseimage, briefcasepath.endswith("parrot.png"))
         briefcasegroup.add(briefcase)
     for event in pygame.event.get() :
         if event.type == pygame.QUIT :
