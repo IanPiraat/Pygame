@@ -26,10 +26,8 @@ clock = pygame.time.Clock()
 
 
 music = pygame.mixer.Sound("sounds\spacesound\sounds jumpyrun\Lexica - Helios.wav")
-
-
-
-
+jump = pygame.mixer.Sound("sounds\spacesound\sounds jumpyrun\jumpy.wav")
+collect = pygame.mixer.Sound("sounds\spacesound\sounds jumpyrun\collect.wav")
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, image):
         super().__init__()
@@ -43,6 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_target = self.rect.y
 
     def start_jump(self, charge):
+        jump.play()
         charge_seconds = charge / 400
         jump_height = max(1, min(int(charge_seconds * 500), 240))
         if self.rect.y == self.ground_y:
@@ -55,6 +54,7 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y -= 3
             else:
                 self.jumping = False
+                self.image = playeridle
         elif self.rect.y < self.ground_y:
             self.rect.y += 3
 class Briefcase(pygame.sprite.Sprite):
@@ -82,6 +82,7 @@ class Briefcase(pygame.sprite.Sprite):
         global score
         if self.active and self.rect.colliderect(player_rect):
             self.kill()
+            collect.play()
             if self.is_parrot:
                 score += 2
             else :
@@ -126,10 +127,14 @@ while True :
             if event.key == pygame.K_w:
                 start = pygame.time.get_ticks()
                 playerstatus = 0
+                player.image = playerjump
+                player.rect.y = player.ground_y - 50
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_w:
                 stop = pygame.time.get_ticks()
                 playerstatus = 1
+                player.image = playeridle
+                player.rect.y = player.ground_y
                 chargetime = stop - start
                 player.start_jump(chargetime)
         if event.type == pygame.KEYDOWN:
