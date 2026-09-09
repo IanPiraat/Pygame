@@ -39,7 +39,7 @@ class bird(pygame.sprite.Sprite):
     def update(self) :
          global replaydeath
          if flying == True :
-            self.velocity += 0.001
+            self.velocity += 0.004
             if self.rect.bottom <= 625 :
                 self.rect.y += self.velocity
             else :
