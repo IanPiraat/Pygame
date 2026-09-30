@@ -5,6 +5,7 @@ WIDTH = 960
 HEIGHT =549
 playercharge = False
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
+font1 = pygame.font.SysFont("Sans Serif",50)
 
 background = pygame.image.load("images/images probow/bg.png")
 playeridleL = pygame.image.load("images/images probow/playeridle.png")
@@ -29,46 +30,51 @@ class player(pygame.sprite.Sprite) :
         self.y = y 
         self.status = status
         self.health = health
+        health1 = health
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
         
 class arrows(pygame.sprite.Sprite) :
-    def __init__(self,x,y,image,velocity,charge,damage,direction) :
+    def __init__(self,x,y,image,velocity,charge,damage,direction,target) :
         super().__init__()
-        self.angle = 0
+       # self.angle = 0
         self.x = x 
         self.y = y
-        self.image = image 
-        self.original_image =image
+        #self.original_image =image
         self.velocity = velocity
         self.charge = charge
         self.damage = damage
+        tx,ty = target
+        dx = tx - self.x
+        dy = ty - self.y
+        angle = math.atan2(dy,dx)
+        self.vx = math.cos(angle) * self.velocity
+        self.vy = math.sin(angle) * self.velocity
         self.direction = direction
+        self.image = pygame.transform.rotate(image, -math.degrees(angle))
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-
-        mousex, mouse_y = pygame.mouse.get_pos()
-        dx = mousex - self.x
-        dy = mouse_y - self.y
-        self.angle = math.degrees(math.atan2(-dy,dx))
-        self.image = pygame.transform.rotate(self.original_image,self.angle)
-        self.rect = self.image.get_rect()
+        
+        
                 
     def update(self) :
         
-        if self.direction == "left" :
+        # if self.direction == "left" :
             
-                self.x += math.cos(math.radians(self.angle)) * self.velocity
-                self.y -= math.sin(math.radians(self.angle)) * self.velocity 
-                self.rect.center = (self.x, self.y)
+        #         self.x += math.cos(math.radians(self.angle)) * self.velocity
+        #         self.y -= math.sin(math.radians(self.angle)) * self.velocity 
+        #         self.rect.center = (self.x, self.y)
         
            
-        elif self.direction == "right" :
+        # elif self.direction == "right" :
              
-                    self.x -= math.cos(math.radians(self.angle)) * self.velocity
-                    self.y -= math.sin(math.radians(self.angle)) * self.velocity 
-                    self.rect.center = (self.x, self.y)
+        #             self.x -= math.cos(math.radians(self.angle)) * self.velocity
+        #             self.y -= math.sin(math.radians(self.angle)) * self.velocity 
+        #             self.rect.center = (self.x, self.y)
+        self.x += self.vx
+        self.y += self.vy
+        self.rect.center = self.x,self.y
         if self.rect.right < 0 or self.rect.left > WIDTH or self.rect.top > HEIGHT or self.rect.bottom < 0 :  
               self.kill()        
         
@@ -87,10 +93,11 @@ enemygroup.add(enemy)
 music.play(-1)
 
 
-
+clock = pygame.time.Clock()
 
 
 while True :
+    clock.tick(60)
     screen.fill("white")
     screen.blit(background,(0,0))
     for event in pygame.event.get() :
@@ -100,18 +107,21 @@ while True :
         elif event.type == pygame.MOUSEBUTTONDOWN :
             pos = pygame.mouse.get_pos()
             shootarrow.play()
-            Arrow = arrows(player1.rect.right,player1.rect.centery,image=arrow,velocity=5,charge=100,damage=10,direction="left")
+            Arrow = arrows(player1.rect.right,player1.rect.centery,image=arrow,velocity=5,charge=100,damage=10,direction="left",target=pygame.mouse.get_pos())
             Arrowgroup.add(Arrow)
-            Arrow2 = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
-            EnemyArrowGroup.add(Arrow2)    
+            #Arrow2 = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
+            #EnemyArrowGroup.add(Arrow2)    
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_w :
                     pos = pygame.mouse.get_pos()
                     shootarrow.play()
-                    Arrow2 = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
+                    Arrow2 = arrows(enemy.rect.left,enemy.rect.centery,image=arrow,velocity=5,charge=100,damage=10,direction="right",target=player1.rect.center)
                     EnemyArrowGroup.add(Arrow2)
                     print(Arrow2.rect.right,Arrow2.rect.centery)
-                    
+
+                    print("enemy arrows:",len(EnemyArrowGroup))
+    text1 = font1.render("p1 health = {}".format(player1.health),True,"#c2380e")
+    screen.blit(text1,(600,30))            
              
     Arrowgroup.update()
     EnemyArrowGroup.update()
