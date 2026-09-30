@@ -58,20 +58,19 @@ class arrows(pygame.sprite.Sprite) :
     def update(self) :
         
         if self.direction == "left" :
-            if self.rect.x < 960 and (self.rect.y > 0 or self.rect.y < HEIGHT) :
+            
                 self.x += math.cos(math.radians(self.angle)) * self.velocity
                 self.y -= math.sin(math.radians(self.angle)) * self.velocity 
                 self.rect.center = (self.x, self.y)
         
-            else :
-                self.kill()
+           
         elif self.direction == "right" :
-             if self.rect.x > 0 and (self.rect.y > 0 or self.rect.y < HEIGHT+100) :
+             
                     self.x -= math.cos(math.radians(self.angle)) * self.velocity
                     self.y -= math.sin(math.radians(self.angle)) * self.velocity 
                     self.rect.center = (self.x, self.y)
-             else :
-                self.kill()       
+        if self.rect.right < 0 or self.rect.left > WIDTH or self.rect.top > HEIGHT or self.rect.bottom < 0 :  
+              self.kill()        
         
         
 player1 = player(100,400,health=100,image=playeridleL,status="idle",)
@@ -103,15 +102,13 @@ while True :
             shootarrow.play()
             Arrow = arrows(player1.rect.right,player1.rect.centery,image=arrow,velocity=5,charge=100,damage=10,direction="left")
             Arrowgroup.add(Arrow)
-            Arrow2 = arrows(WIDTH/2,HEIGHT/2,image=arrow,velocity=5,charge=100,damage=10,direction="right")
-            EnemyArrowGroup.add(Arrow2)
-            print(Arrow2.rect.right,Arrow2.rect.centery)
+            Arrow2 = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
+            EnemyArrowGroup.add(Arrow2)    
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_w :
                     pos = pygame.mouse.get_pos()
                     shootarrow.play()
-                    #Arrow = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
-                    Arrow2 = arrows(WIDTH/2,HEIGHT/2,image=arrow,velocity=-5,charge=100,damage=10,direction="right")
+                    Arrow2 = arrows(enemy.rect.right,enemy.rect.centery,image=arrowR,velocity=5,charge=100,damage=10,direction="right")
                     EnemyArrowGroup.add(Arrow2)
                     print(Arrow2.rect.right,Arrow2.rect.centery)
                     
